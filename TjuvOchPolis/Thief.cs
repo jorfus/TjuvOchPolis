@@ -6,15 +6,15 @@ namespace TjuvOchPolis
 {
     class Thief : Person
     {
-        public Thief() : this(new City(0, 0), new bool[] { true, true, true, true }) { }
-        public Thief(City city, bool[] itemsArray) : base(city, itemsArray)
+        public Thief() : this(new City(0, 0, 0, 0, 0), new List<Person>()) { }
+        public Thief(City city, List<Person> thePersonList) : base(city, thePersonList)
         {
             PersonType = "Thief";
         }
 
         public override string ToString()
         {
-            string positionStr = $"{Position[0]}, {Position[1]}";
+            string positionStr = $"{Position[1] + 1}, {Position[0] + 1}";
             string velocityStr = $"{Velocity[0]}, {Velocity[1]}";
 
             string listStr = "";

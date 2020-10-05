@@ -6,17 +6,29 @@ namespace TjuvOchPolis
     {
         static void Main(string[] args)
         {
-            City city = new City(0, 0);
-            PersonList personList = new PersonList(3);
-            
-            Person person;
+            City city = new City(10, 5, 4, 2, 2);
+            city.DrawCity();
 
-            while (true)
+            bool loop = true;
+            while (loop)
             {
-                
+                ConsoleKeyInfo input = Console.ReadKey(true);
 
-                Console.Write(personList);
-                Console.ReadKey(true);
+                switch (input.Key)
+                {
+                    case ConsoleKey.Enter:
+                        Console.Clear();
+                        city.DrawCity();
+                        break;
+                    case ConsoleKey.Tab:
+                        Console.Write(city);
+                        break;
+                    case ConsoleKey.Escape:
+                        loop = false;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
