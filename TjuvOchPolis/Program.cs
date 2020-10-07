@@ -6,8 +6,8 @@ namespace TjuvOchPolis
     {
         static void Main(string[] args)
         {
-            City city = new City(10, 5, 4, 2, 2);
-            city.DrawCity();
+            City city = new City(5, 5, 2, 2, 2);
+            Console.Write(city.DrawCity());
 
             bool loop = true;
             while (loop)
@@ -17,8 +17,7 @@ namespace TjuvOchPolis
                 switch (input.Key)
                 {
                     case ConsoleKey.Enter:
-                        Console.Clear();
-                        city.DrawCity();
+                        RunSimulation(city);
                         break;
                     case ConsoleKey.Tab:
                         Console.Write(city);
@@ -30,6 +29,13 @@ namespace TjuvOchPolis
                         break;
                 }
             }
+        }
+        public static void RunSimulation(City city)
+        {
+            city.MovePersons();
+
+            Console.Clear();
+            Console.Write(city.DrawCity());
         }
     }
 }

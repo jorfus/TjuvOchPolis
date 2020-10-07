@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TjuvOchPolis
 {
@@ -21,7 +23,7 @@ namespace TjuvOchPolis
             Person person;
             for (int i = 1; i <= citizens; i++)
             {
-                person = new Citizen(this, ThePersonList);
+                person = new Citizen(this, ThePersonList, false);
                 ThePersonList.Add(person);
             }
             for (int i = 1; i <= police; i++)
@@ -36,10 +38,27 @@ namespace TjuvOchPolis
             }
         }
 
-        public void PlacePerson(Person person)
+        public void MovePersons()
         {
-            int row = person.Position[0];
+            foreach (Person person in ThePersonList)
+            {
+                int column = person.Position[1];
+                int row = person.Position[0];
+
+                TheCity[row, column] = ' ';
+
+                person.GetPosition(TheCity);
+            }
+
+            //foreach (Person person in ThePersonList)
+
+            foreach (Person person in ThePersonList)
+                PlacePersons(person);
+        }
+        public void PlacePersons(Person person)
+        {
             int column = person.Position[1];
+            int row = person.Position[0];
 
             switch (person)
             {
@@ -56,15 +75,18 @@ namespace TjuvOchPolis
                     break;
             }
         }
-        public void DrawCity()
+        public string DrawCity()
         {
+            string str = "";
+
             for (int row = 0; row <= TheCity.GetUpperBound(0); row++)
             {
                 for (int column = 0; column <= TheCity.GetUpperBound(1); column++)
-                    Console.Write(TheCity[row, column]);
+                    str += TheCity[row, column];
 
-                Console.WriteLine();
+                str += "\n";
             }
+            return str;
         }
         public override string ToString()
         {
