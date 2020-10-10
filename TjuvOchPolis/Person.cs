@@ -9,9 +9,9 @@ namespace TjuvOchPolis
     class Person
     {
         public string PersonType { get; protected set; }
-        public int[] Position { get; private set; } = new int[2];
-        protected int[] Velocity { get; set; } = { 0, 0 };
-        public List<Item> Items { get; private set; } = new List<Item>();
+        protected int[] Position { get; private set; } = new int[2];
+        protected int[] Velocity { get; private set; } = { 0, 0 };
+        protected List<Item> Items { get; private set; } = new List<Item>();
 
         protected Person() : this(new City(0, 0, 0, 0, 0), new List<Person>()) { }
         protected Person(City city, List<Person> thePersonList)
@@ -45,8 +45,7 @@ namespace TjuvOchPolis
 
             Position[1] = column;
             Position[0] = row;
-            city.PlacePersons(this);
-
+            
             (Velocity[1], Velocity[0]) = GetVelocity();
         }
 
@@ -68,7 +67,16 @@ namespace TjuvOchPolis
 
             return (column, row);
         }
-        public (int, int) GetPosition(char[,] theCity)
+        public void Take(Person person)
+        {
+            Items.AddRange(person.Items);
+            person.Items.Clear();
+        }
+        public (int, int) GetPosition()
+        {
+            return (Position[1], Position[0]);
+        }
+        public (int, int) NewPosition(char[,] theCity)
         {
             Position[1] += Velocity[1];
             Position[0] += Velocity[0];
@@ -86,6 +94,10 @@ namespace TjuvOchPolis
             (Velocity[1], Velocity[0]) = GetVelocity();
 
             return (Position[1], Position[0]);
+        }
+        public void PersonInteractions()
+        {
+            //Position
         }
         public override string ToString()
         {

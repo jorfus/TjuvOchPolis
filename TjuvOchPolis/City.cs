@@ -4,6 +4,10 @@ using System.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections;
+using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
+using System.Diagnostics.Tracing;
 
 namespace TjuvOchPolis
 {
@@ -36,44 +40,86 @@ namespace TjuvOchPolis
                 person = new Thief(this, ThePersonList);
                 ThePersonList.Add(person);
             }
+
+            PlacePersons();
         }
 
+        void PlacePersons()
+        {
+            foreach (Person person in ThePersonList)
+            {
+                (int column, int row) = person.GetPosition();
+
+                switch (person.PersonType)
+                {
+                    case "Citizen":
+                        TheCity[row, column] = 'M';
+                        break;
+                    case "Police":
+                        TheCity[row, column] = 'P';
+                        break;
+                    case "Thief":
+                        TheCity[row, column] = 'T';
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
         public void MovePersons()
         {
             foreach (Person person in ThePersonList)
             {
-                int column = person.Position[1];
-                int row = person.Position[0];
-
+                (int column, int row) = person.GetPosition();
                 TheCity[row, column] = ' ';
 
-                person.GetPosition(TheCity);
+                person.NewPosition(TheCity);
             }
 
-            //foreach (Person person in ThePersonList)
+            List<List<Person>> personCollisionLists = new List<List<Person>>();
 
-            foreach (Person person in ThePersonList)
-                PlacePersons(person);
-        }
-        public void PlacePersons(Person person)
-        {
-            int column = person.Position[1];
-            int row = person.Position[0];
-
-            switch (person)
+            for (int index = 0; index < ThePersonList.Count - 1;)
             {
-                case Citizen citizen:
-                    TheCity[row, column] = 'M';
-                    break;
-                case Police police:
-                    TheCity[row, column] = 'P';
-                    break;
-                case Thief thief:
-                    TheCity[row, column] = 'T';
-                    break;
-                default:
-                    break;
+                List<Person> positionMatches = ThePersonList.FindAll(x => x.GetPosition() == ThePersonList[index].GetPosition());
+
+                if (positionMatches.Count > 1)
+                {
+                    (int column, int row) = ThePersonList[index].GetPosition();
+                    personCollisionLists.Add(positionMatches);
+                    ThePersonList.RemoveAll(x => x.GetPosition() == (column, row));
+                }
+                else
+                    index++;
             }
+
+            foreach (List<Person> personList in personCollisionLists)
+            {
+                Person thief = personList.Find(x => x.PersonType == "Thief");
+                
+                if (thief == null)
+                    break;
+                else
+                {
+                    Person police = personList.Find(x => x.PersonType == "Police");
+
+                    if (police == null)
+                    {
+                        Person citizen = personList.Find(x => x.PersonType == "Citizen");
+
+                        if (citizen == null)
+                            break;
+                        else
+                            thief.Take(citizen);
+                    }
+                    else if (police.PersonType == "Police")
+                    {
+                        police.Take(thief);
+                        personList.Remove(thief);
+                    }
+                } //BACKNING EFTER KOLLISION ?????
+            }
+
+            PlacePersons();
         }
         public string DrawCity()
         {
@@ -93,7 +139,7 @@ namespace TjuvOchPolis
             string listStr = "";
             foreach (Person item in ThePersonList)
                 listStr += $"{item}\n";
-
+            
             return listStr;
         }
     }

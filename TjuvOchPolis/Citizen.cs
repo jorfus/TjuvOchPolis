@@ -10,7 +10,7 @@ namespace TjuvOchPolis
         public Citizen(City city, List<Person> thePersonList, bool randomItems) : base(city, thePersonList)
         {
             PersonType = "Citizen";
-
+            
             Random rand = new Random();
             Item item;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 
 namespace TjuvOchPolis
 {
@@ -6,7 +7,7 @@ namespace TjuvOchPolis
     {
         static void Main(string[] args)
         {
-            City city = new City(5, 5, 2, 2, 2);
+            City city = new City(10, 10, 10, 3, 5);
             Console.Write(city.DrawCity());
 
             bool loop = true;
