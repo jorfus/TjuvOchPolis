@@ -10,74 +10,75 @@ namespace TjuvOchPolis
     {
         public string PersonType { get; protected set; }
         protected int[] Position { get; private set; } = new int[2];
-        protected int[] Velocity { get; private set; } = { 0, 0 };
+        protected int[] Velocity { get; private set; } = new int[2];
         protected List<Item> Items { get; private set; } = new List<Item>();
+        static Random Rand { get; set; } = new Random();
 
         protected Person() : this(new City(0, 0, 0, 0, 0), new List<Person>()) { }
         protected Person(City city, List<Person> thePersonList)
         {
-            Random rand = new Random();
             int column = 0;
             int row = 0;
 
-            bool loop = true;
-            while (loop)
+            while (true)
             {
-                column = rand.Next(0, city.TheCity.GetUpperBound(1) + 1);
-                row = rand.Next(0, city.TheCity.GetUpperBound(0) + 1);
+                column = Rand.Next(0, city.TheCity.GetUpperBound(1) + 1);
+                row = Rand.Next(0, city.TheCity.GetUpperBound(0) + 1);
 
                 if (thePersonList.Count != 0)
                 {
-                    foreach (Person person in thePersonList)
-                    {
-                        if (column == person.Position[1] && row == person.Position[0])
-                        {
-                            loop = true;
-                            break;
-                        }
-                        else
-                            loop = false;
-                    }
+                    Person person = thePersonList.Find(x => x.GetPosition() == (column, row));
+                    if (person == null)
+                        break;
                 }
                 else
-                    loop = false;
+                    break;
             }
 
             Position[1] = column;
             Position[0] = row;
-            
-            (Velocity[1], Velocity[0]) = GetVelocity();
         }
 
-        (int, int) GetVelocity()
+        void GetVelocity(bool reverseVelocity)
         {
-            Random rand = new Random();
-            int column;
-            int row;
-
-            if (rand.Next(0, 2) == 0)
-                column = -1;
+            if (reverseVelocity)
+            {
+                Velocity[1] *= -1;
+                Velocity[0] *= -1;
+            }
             else
-                column = 1;
+                do
+                {
+                    Velocity[1] = Rand.Next(-1, 2);
+                    Velocity[0] = Rand.Next(-1, 2);
 
-            if (rand.Next(0, 2) == 0)
-                row = -1;
-            else
-                row = 1;
-
-            return (column, row);
+                } while (Velocity[1] == 0 && Velocity[0] == 0);
         }
-        public void Take(Person person)
+        public void Take(Person person, bool random)
         {
-            Items.AddRange(person.Items);
-            person.Items.Clear();
+            if (person.Items.Count != 0)
+            {
+                if (random)
+                {
+                    int randIndex = Rand.Next(0, person.Items.Count - 1);
+                    Items.Add(person.Items[randIndex]);
+                    person.Items.RemoveAt(randIndex);
+                }
+                else
+                {
+                    Items.AddRange(person.Items);
+                    person.Items.Clear();
+                }
+            }
         }
         public (int, int) GetPosition()
         {
             return (Position[1], Position[0]);
         }
-        public (int, int) NewPosition(char[,] theCity)
+        public void NewPosition(char[,] theCity, bool reverseVelocity)
         {
+            GetVelocity(reverseVelocity);
+
             Position[1] += Velocity[1];
             Position[0] += Velocity[0];
 
@@ -90,25 +91,17 @@ namespace TjuvOchPolis
                 Position[0] = 0;
             else if (Position[0] < 0)
                 Position[0] = theCity.GetUpperBound(0);
-
-            (Velocity[1], Velocity[0]) = GetVelocity();
-
-            return (Position[1], Position[0]);
-        }
-        public void PersonInteractions()
-        {
-            //Position
         }
         public override string ToString()
         {
             string positionStr = $"{Position[1] + 1}, {Position[0] + 1}";
-            string velocityStr = $"{Velocity[0]}, {Velocity[1]}";
+            string velocityStr = $"{Velocity[1]}, {Velocity[0]}";
 
             string listStr = "";
             foreach (Item item in Items)
                 listStr += $"{item}\n";
 
-            return $"(BASE CLASS)\nPos: {positionStr} Next move: {velocityStr}\n\nInventory:\n{listStr}";
+            return $"(BASE CLASS)\nPos: {positionStr} Direction: {velocityStr}\n\nInventory:\n{listStr}";
             
         }
     }

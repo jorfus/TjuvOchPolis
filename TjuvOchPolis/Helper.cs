@@ -8,6 +8,5 @@ namespace TjuvOchPolis
 {
     class Helper
     {
-        
     }
 }
